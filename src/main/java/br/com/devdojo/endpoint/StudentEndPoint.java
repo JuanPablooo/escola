@@ -2,6 +2,7 @@ package br.com.devdojo.endpoint;
 
 
 import br.com.devdojo.error.CostumErrorType;
+import br.com.devdojo.error.ResourceNotFoundException;
 import br.com.devdojo.model.Student;
 import br.com.devdojo.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,18 +39,20 @@ public class StudentEndPoint {
     //@RequestMapping(method = RequestMethod.GET, path = "/{id}")
     @GetMapping(path = "/{id}")
     public ResponseEntity<?> getStudentById(@PathVariable("id") Long id){
+        verifyIfStudentExists(id);
         Student student = studentDAO.findOne(id);
-        if(student == null ) {
-            return new ResponseEntity<>(new CostumErrorType("Student not found"), HttpStatus.NOT_FOUND );
-        }
         return  new  ResponseEntity<>(student, HttpStatus.OK);
+    }
+    @GetMapping(path = "findByName/{name}")
+    public ResponseEntity<?> findByName(@PathVariable String name){
+        return new ResponseEntity<>(studentDAO.findByNameIgnoreCaseContaining(name), HttpStatus.OK);
     }
 
     //@RequestMapping(method = RequestMethod.POST)
     @PostMapping
     public ResponseEntity<?> save(@RequestBody Student student ){
         //Student studentWithId = studentDAO.save(student); //estudante salvo no banco
-        return new ResponseEntity<> (studentDAO.save(student), HttpStatus.OK);
+        return new ResponseEntity<> (studentDAO.save(student), HttpStatus.CREATED);
 
     }
 
@@ -57,6 +60,7 @@ public class StudentEndPoint {
     //@RequestMapping(method = RequestMethod.DELETE)
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
+        verifyIfStudentExists(id);
         studentDAO.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -65,10 +69,16 @@ public class StudentEndPoint {
     //@RequestMapping(method = RequestMethod.PUT)
     @PutMapping
     public ResponseEntity<?> update(@RequestBody Student student){
+        verifyIfStudentExists(student.getId());
         studentDAO.save(student);
         //se atualizou nao preciso retornar o estudante, pois ele que enviou o estudante
         return new ResponseEntity<> (HttpStatus.OK);
     }
 
+    private void verifyIfStudentExists(Long id){
+        if( studentDAO.findOne(id) == null ) {
+            throw new ResourceNotFoundException("Student not found for id: "+id);
+        }
+    }
 
 }
