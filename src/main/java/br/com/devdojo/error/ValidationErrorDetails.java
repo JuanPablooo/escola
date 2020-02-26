@@ -1,6 +1,6 @@
 package br.com.devdojo.error;
 
-public class ValidationErrorDetail extends ErrorDetail {
+public class ValidationErrorDetails extends ErrorDetails {
     private String field;
     private String fieldMessage;
 
@@ -73,13 +73,15 @@ public class ValidationErrorDetail extends ErrorDetail {
             return this;
         }
 
-        public ValidationErrorDetail build() {
-            ValidationErrorDetail validationErrorDetail = new ValidationErrorDetail();
+        public ValidationErrorDetails build() {
+            ValidationErrorDetails validationErrorDetail = new ValidationErrorDetails();
             validationErrorDetail.setStatus(status);
             validationErrorDetail.setDetail(detail);
             validationErrorDetail.setDeveloperMessage(developerMessage);
             validationErrorDetail.setTitle(title);
             validationErrorDetail.setTimestamp(timestamp);
+            validationErrorDetail.field = field;
+            validationErrorDetail.fieldMessage = field;
             return validationErrorDetail;
         }
     }
