@@ -2,12 +2,17 @@ package br.com.devdojo.handler;
 
 import br.com.devdojo.error.ResourceNotFoundDetails;
 import br.com.devdojo.error.ResourceNotFoundException;
+import br.com.devdojo.error.ValidationErrorDetail;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -20,6 +25,29 @@ public class RestExceptionHandler {
                 .title("Resource not found")
                 .detail(rfnException.getMessage())
                 .developerMessage(rfnException.getClass().getName())
+                .build();
+        return new ResponseEntity<>(rfnDetail, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException manvException){
+        System.out.println(manvException.toString());
+        System.out.println("-=-=-=-=-=-=-=-=-=-");
+        System.out.println(manvException.getBindingResult().getFieldErrors());
+
+        List<FieldError> fieldErrors = manvException.getBindingResult().getFieldErrors();
+        String fields = fieldErrors.stream().map(FieldError::getField).collect(Collectors.joining(","));
+        String fieldMessages = fieldErrors.stream().map(FieldError::getDefaultMessage).collect(Collectors.joining(","));
+        ValidationErrorDetail rfnDetail = ValidationErrorDetail.Builder
+                .newBuilder()
+                .timestamp(new Date().getTime())
+                .status(HttpStatus.NOT_FOUND.value())
+                .title("field validation Error")
+                .detail("field validation Error")
+                .developerMessage(manvException.getClass().getName())
+                .field(fields)
+                .fieldMessage(fieldMessages)
                 .build();
         return new ResponseEntity<>(rfnDetail, HttpStatus.NOT_FOUND);
     }

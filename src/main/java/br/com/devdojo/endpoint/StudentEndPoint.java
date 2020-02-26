@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import sun.net.www.http.HttpClient;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -50,7 +52,7 @@ public class StudentEndPoint {
 
     //@RequestMapping(method = RequestMethod.POST)
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody Student student ){
+    public ResponseEntity<?> save(@Valid @RequestBody Student student ){
         //Student studentWithId = studentDAO.save(student); //estudante salvo no banco
         return new ResponseEntity<> (studentDAO.save(student), HttpStatus.CREATED);
 
