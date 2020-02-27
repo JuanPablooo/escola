@@ -26,7 +26,7 @@ import static java.util.Arrays.asList;
 
 // o RestController adiciona o responsybody para todos os metodos
 @RestController
-@RequestMapping("students")
+@RequestMapping("v1")
 public class StudentEndPoint {
     private final StudentRepository studentDAO;
 
@@ -36,7 +36,7 @@ public class StudentEndPoint {
     }
 
     // @RequestMapping(method = RequestMethod.GET)
-    @GetMapping
+    @GetMapping(path = "protected/students")
     public ResponseEntity<?> listAll(Pageable pageable){
 
         //System.out.println(dateUtil.formatLocalDateTimeToDatabaseStyle(LocalDateTime.now()));
@@ -44,7 +44,7 @@ public class StudentEndPoint {
     }
 
     //@RequestMapping(method = RequestMethod.GET, path = "/{id}")
-    @GetMapping(path = "/{id}")
+    @GetMapping(path = "protected/students/{id}")
     public ResponseEntity<?> getStudentById(@PathVariable("id") Long id,
                                             @AuthenticationPrincipal UserDetails userDetails){
         System.out.println(userDetails);
@@ -52,13 +52,13 @@ public class StudentEndPoint {
         Student student = studentDAO.findOne(id);
         return  new  ResponseEntity<>(student, HttpStatus.OK);
     }
-    @GetMapping(path = "findByName/{name}")
+    @GetMapping(path = "protected/students/findByName/{name}")
     public ResponseEntity<?> findByName(@PathVariable String name){
         return new ResponseEntity<>(studentDAO.findByNameIgnoreCaseContaining(name), HttpStatus.OK);
     }
 
     //@RequestMapping(method = RequestMethod.POST)
-    @PostMapping
+    @PostMapping(path = "admin/students")
     public ResponseEntity<?> save(@Valid @RequestBody Student student ){
         //Student studentWithId = studentDAO.save(student); //estudante salvo no banco
         return new ResponseEntity<> (studentDAO.save(student), HttpStatus.CREATED);
@@ -67,8 +67,8 @@ public class StudentEndPoint {
 
 
     //@RequestMapping(method = RequestMethod.DELETE)
-    @DeleteMapping(path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping(path = "admin/students/{id}")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
         verifyIfStudentExists(id);
         studentDAO.delete(id);
@@ -77,7 +77,7 @@ public class StudentEndPoint {
 
 
     //@RequestMapping(method = RequestMethod.PUT)
-    @PutMapping
+    @PutMapping(path = "admin/students")
     public ResponseEntity<?> update(@RequestBody Student student){
         verifyIfStudentExists(student.getId());
         studentDAO.save(student);
