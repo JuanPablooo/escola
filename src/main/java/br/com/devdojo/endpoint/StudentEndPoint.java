@@ -37,8 +37,8 @@ public class StudentEndPoint {
 
     // @RequestMapping(method = RequestMethod.GET)
     @GetMapping(path = "protected/students")
+    // public ResponseEntity<?> listAll(Pageable pageable){
     public ResponseEntity<?> listAll(Pageable pageable){
-
         //System.out.println(dateUtil.formatLocalDateTimeToDatabaseStyle(LocalDateTime.now()));
         return new ResponseEntity<>(studentDAO.findAll(pageable), HttpStatus.OK);
     }
